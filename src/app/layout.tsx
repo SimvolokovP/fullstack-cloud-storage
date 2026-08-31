@@ -10,10 +10,10 @@ import {
   SITE_PUBLISHER,
   SITE_URL,
 } from "@/shared/constants/seo.constants";
-import { Providers } from "@/shared/providers/providers";
 import { cn } from "@/shared/lib/utils";
+import { Providers } from "@/shared/providers/providers";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -50,7 +50,12 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={cn(manrope.variable, unbounded.variable, "font-sans", geist.variable)}
+      className={cn(
+        manrope.variable,
+        unbounded.variable,
+        "font-sans",
+        geist.variable,
+      )}
       suppressHydrationWarning
     >
       <head>{/* meta */}</head>

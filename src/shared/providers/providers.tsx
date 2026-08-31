@@ -1,22 +1,15 @@
 "use client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { PropsWithChildren, useState } from "react";
+
+import { PropsWithChildren } from "react";
+import { QueryClientAppProvider } from "./query-client-app-provider";
+import { ThemeProvider } from "./theme-provider";
 
 export function Providers({ children }: PropsWithChildren) {
-  const [client] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-            refetchOnReconnect: true,
-            retry: 1,
-            staleTime: 5 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-          },
-        },
-      }),
+  return (
+    <QueryClientAppProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {children}
+      </ThemeProvider>
+    </QueryClientAppProvider>
   );
-
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
