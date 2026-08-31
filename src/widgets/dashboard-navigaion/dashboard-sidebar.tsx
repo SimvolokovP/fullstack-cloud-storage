@@ -17,7 +17,7 @@ export function DashboardSidebar() {
   return (
     <aside
       className={cn(
-        "relative hidden h-full shrink-0 border-r border-border/60 bg-card transition-[width] duration-200 md:flex md:flex-col",
+        "relative hidden h-full shrink-0 border-r border-border/60 bg-background/90 transition-[width] duration-200 md:flex md:flex-col",
         isCollapsed ? "w-16" : "w-64",
       )}
     >
