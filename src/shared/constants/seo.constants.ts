@@ -1,4 +1,4 @@
-export const SITE_NAME = "Cloud Box";
+export const SITE_NAME = "CloudBox";
 
 export const SITE_NAME_SHORT = "CBOX";
 

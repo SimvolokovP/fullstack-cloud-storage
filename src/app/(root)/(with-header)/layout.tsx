@@ -1,6 +1,5 @@
-// import { Footer } from "./footer";
+import { Footer } from "./footer";
 import { Header } from "./header";
-
 
 export default function Layout({
   children,
@@ -15,9 +14,7 @@ export default function Layout({
         <div className="pb-24 md:py-8 lg:pb-8">{children}</div>
       </main>
 
-      {/* <MobileNavigation navigation={navigation} /> */}
-
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }
