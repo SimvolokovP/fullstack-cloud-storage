@@ -13,4 +13,10 @@ export const PAGES = {
   MAIN_FEATURES: `${rootPath}#features`,
   MAIN_PRICING: `${rootPath}#pricing`,
   MAIN_SECURITY: `${rootPath}#security`,
+
+  DASHBOARD: "/dashboard",
+  DASHBOARD_FILES: "/dashboard/files",
+  DASHBOARD_RECENT: "/dashboard/recent",
+  DASHBOARD_TRASH: "/dashboard/trash",
+  DASHBOARD_SETTINGS: "/dashboard/settings",
 };
