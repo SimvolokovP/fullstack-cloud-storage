@@ -28,7 +28,7 @@ export function DashboardSidebar() {
         )}
       >
         <Link
-          href={PAGES.DASHBOARD}
+          href={PAGES.MAIN}
           className="flex min-w-0 items-center gap-2"
         >
           <CloudUpload />
