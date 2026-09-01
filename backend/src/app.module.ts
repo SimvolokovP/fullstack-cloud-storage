@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { Account } from './auth/entities/account.entity';
+import { IS_DEV_ENV } from './libs/common/utils/is-dev.util';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { Account } from './auth/entities/account.entity';
         password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DB'),
         entities: [User, Account],
-        synchronize: process.env.NODE_ENV === 'development',
+        synchronize: IS_DEV_ENV,
       }),
     }),
     UserModule,
