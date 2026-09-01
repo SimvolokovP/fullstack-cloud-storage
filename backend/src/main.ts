@@ -55,4 +55,5 @@ async function bootstrap() {
 
   await app.listen(config.getOrThrow<number>('APPLICATION_PORT'));
 }
+
 bootstrap();
