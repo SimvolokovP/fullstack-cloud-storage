@@ -137,7 +137,7 @@ export class AuthService {
 
           return reject(
             new InternalServerErrorException(
-              `Не удалось保存 сессию в хранилище Redis: ${err.message || err}`,
+              `Не удалось сохранить сессию в хранилище Redis: ${err.message || err}`,
             ),
           );
         }

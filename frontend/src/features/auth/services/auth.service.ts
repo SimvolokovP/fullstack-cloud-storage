@@ -30,6 +30,7 @@ export const authService = {
     const response = await API.post<void>("/auth/email-confirmation", {
       token,
     });
+    console.log(response.data);
     return response.data;
   },
 

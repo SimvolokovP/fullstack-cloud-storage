@@ -82,6 +82,7 @@ export class UserService {
       email: dto.email,
       displayName: dto.name,
       isTwoFactorEnabled: dto.isTwoFactorEnabled,
+      isVerified: dto.isVerified,
     });
 
     return this.userRepository.save(user);

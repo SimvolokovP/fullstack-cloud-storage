@@ -61,6 +61,8 @@ export class EmailConfirmationService {
       );
     }
 
+    existingUser.isVerified = true;
+
     await this.userService.update(existingUser.id, {
       isVerified: true,
     });
