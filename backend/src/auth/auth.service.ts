@@ -13,12 +13,17 @@ import { Session, SessionData } from 'express-session';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Account } from './entities/account.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   public constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
   ) {}
 
   async register(req: Request, dto: RegisterDto) {
@@ -110,5 +115,50 @@ export class AuthService {
         resolve(user);
       });
     });
+  }
+
+  async validateOAuthUser(oauthUser: {
+    email: string;
+    displayName: string;
+    picture: string | null;
+    accessToken: string;
+    refreshToken: string;
+  }): Promise<User> {
+    let user = await this.userService.findByEmail(oauthUser.email);
+
+    if (!user) {
+      user = await this.userService.create({
+        email: oauthUser.email,
+        password: '',
+        displayName: oauthUser.displayName,
+        picture: oauthUser.picture || '',
+        method: AuthMethod.YANDEX,
+        isVerified: true,
+      });
+    }
+
+    let account = await this.accountRepository.findOne({
+      where: {
+        provider: 'yandex',
+        userId: user.id,
+      },
+    });
+
+    if (account) {
+      account.accessToken = oauthUser.accessToken;
+      account.refreshToken = oauthUser.refreshToken;
+      await this.accountRepository.save(account);
+    } else {
+      account = this.accountRepository.create({
+        type: 'oauth',
+        provider: 'yandex',
+        accessToken: oauthUser.accessToken,
+        refreshToken: oauthUser.refreshToken,
+        userId: user.id,
+      });
+      await this.accountRepository.save(account);
+    }
+
+    return user;
   }
 }
