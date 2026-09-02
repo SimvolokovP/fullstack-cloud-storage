@@ -12,17 +12,17 @@ export default function AuthLayout({
 }>) {
   return (
     <div className="grid min-h-screen h-dvh w-full overflow-hidden bg-background lg:grid-cols-[1fr_2fr]">
-      <aside className="hidden bg-foreground lg:flex lg:flex-col lg:justify-between lg:p-8">
-        <Link href={PAGES.MAIN} className="flex w-fit items-center gap-2 text-muted-foreground">
+      <aside className="hidden bg-card lg:flex lg:flex-col lg:justify-between lg:p-8">
+        <Link href={PAGES.MAIN} className="flex w-fit items-center gap-2">
           <CloudUpload />
 
-          <span className="text-sm text-muted-foreground font-semibold tracking-tight">
+          <span className="text-sm font-semibold tracking-tight">
             {SITE_NAME}
           </span>
         </Link>
 
         <div>
-          <p className="text-4xl text-muted-foreground font-semibold tracking-tight">
+          <p className="text-4xl font-semibold tracking-tight">
             Всё в одном месте.
           </p>
 

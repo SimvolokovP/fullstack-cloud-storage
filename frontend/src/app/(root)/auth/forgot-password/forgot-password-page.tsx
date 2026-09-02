@@ -1,43 +1,34 @@
 "use client";
 
 import Link from "next/link";
-
 import { PAGES } from "@/shared/config/pages-url.config";
-import { SITE_NAME } from "@/shared/constants/seo.constants";
-import { LoginForm } from "@/features/auth/components/login-form";
+import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-form";
 
-export function LoginPage() {
+export function ForgotPasswordPage() {
   return (
     <div className="container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
       <div className="w-full max-w-sm">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
-            С возвращением
+            Восстановление пароля
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Войдите в свой аккаунт {SITE_NAME}
+            Введите ваш email, и мы отправим ссылку для смены пароля
           </p>
         </div>
 
         <div className="mt-8">
-          <LoginForm />
+          <ForgotPasswordForm />
         </div>
 
-        <Link
-          href={PAGES.FORGOT_PASSWORD}
-          className="block w-full text-center mt-2 text-sm text-muted-foreground underline-offset-4 hover:underline"
-        >
-          Забыли пароль?
-        </Link>
-
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Нет аккаунта?{" "}
+          Вспомнили пароль?{" "}
           <Link
-            href={PAGES.REGISTER}
+            href={PAGES.LOGIN}
             className="font-medium text-foreground underline-offset-4 hover:underline"
           >
-            Зарегистрироваться
+            Войти
           </Link>
         </p>
       </div>
