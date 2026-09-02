@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 
 import { PAGES } from "@/shared/config/pages-url.config";
 import { SITE_NAME } from "@/shared/constants/seo.constants";
+import { LoginForm } from "@/features/auth/components/login-form";
 
 export function LoginPage() {
   return (
@@ -17,7 +20,9 @@ export function LoginPage() {
           </p>
         </div>
 
-        <div className="mt-8">форма</div>
+        <div className="mt-8">
+          <LoginForm />
+        </div>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Нет аккаунта?{" "}

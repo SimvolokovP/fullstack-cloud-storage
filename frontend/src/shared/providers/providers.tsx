@@ -3,6 +3,7 @@
 import { PropsWithChildren } from "react";
 import { QueryClientAppProvider } from "./query-client-app-provider";
 import { ThemeProvider } from "./theme-provider";
+import { SonnerToasterProvider } from "./sonner-toaster-provider";
 
 export function Providers({ children }: PropsWithChildren) {
   return (
@@ -10,6 +11,7 @@ export function Providers({ children }: PropsWithChildren) {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {children}
       </ThemeProvider>
+      <SonnerToasterProvider />
     </QueryClientAppProvider>
   );
 }
