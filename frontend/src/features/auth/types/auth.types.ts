@@ -16,6 +16,10 @@ export interface IUser {
 
 export type IAuthResponse = IUser;
 
+export interface IRegisterResponse {
+  message: string;
+}
+
 export interface ILoginCredentials {
   email: string;
   password: string;

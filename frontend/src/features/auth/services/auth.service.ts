@@ -7,11 +7,12 @@ import {
   IUpdateProfileCredentials,
   IChangePasswordCredentials,
   IChangeEmailCredentials,
+  IRegisterResponse,
 } from "../types/auth.types";
 
 export const authService = {
   async register(data: IRegisterCredentials) {
-    const response = await API.post<IAuthResponse>("/auth/register", data);
+    const response = await API.post<IRegisterResponse>("/auth/register", data);
     return response.data;
   },
 
