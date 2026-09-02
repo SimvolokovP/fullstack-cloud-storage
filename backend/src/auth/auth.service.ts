@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -22,10 +24,12 @@ import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 @Injectable()
 export class AuthService {
   public constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
+    @Inject(forwardRef(() => EmailConfirmationService))
     private readonly emailConfirmationService: EmailConfirmationService,
     private readonly twoFactorAuthService: TwoFactorAuthService,
   ) {}

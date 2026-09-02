@@ -23,6 +23,7 @@ export class EmailConfirmationService {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly mailService: MailService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,

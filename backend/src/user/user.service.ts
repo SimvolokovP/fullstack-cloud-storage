@@ -1,15 +1,21 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { hash } from 'argon2';
+import { hash, verify } from 'argon2';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { EmailConfirmationService } from '../auth/email-confirmation/email-confirmation.service';
+import { ChangeEmailDto } from './dto/сhange-email.dto';
 
 @Injectable()
 export class UserService {
@@ -17,16 +23,14 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => EmailConfirmationService))
+    private readonly emailConfirmationService: EmailConfirmationService,
   ) {}
 
   async findById(id: string) {
     const user = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-      relations: {
-        accounts: true,
-      },
+      where: { id },
+      relations: { accounts: true },
     });
 
     if (!user) {
@@ -39,12 +43,10 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    const user = await this.userRepository.findOne({
+    return this.userRepository.findOne({
       where: { email },
       relations: { accounts: true },
     });
-
-    return user;
   }
 
   async create(dto: CreateUserDto) {
@@ -83,5 +85,51 @@ export class UserService {
     });
 
     return this.userRepository.save(user);
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.findById(userId);
+
+    if (!user.password) {
+      throw new BadRequestException(
+        'У вашего аккаунта не установлен пароль (вход через OAuth). Создайте обращение в поддержку.',
+      );
+    }
+
+    const isPasswordValid = await verify(user.password, dto.oldPassword);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Текущий пароль указан неверно.');
+    }
+
+    user.password = await hash(dto.newPassword);
+    await this.userRepository.save(user);
+
+    return { message: 'Пароль успешно изменен.' };
+  }
+
+  async changeEmail(userId: string, dto: ChangeEmailDto) {
+    const user = await this.findById(userId);
+
+    if (user.email === dto.newEmail) {
+      throw new BadRequestException('Новый email совпадает с текущим.');
+    }
+
+    const emailExists = await this.userRepository.findOne({
+      where: { email: dto.newEmail },
+    });
+    if (emailExists) {
+      throw new ConflictException('Этот email уже занят другим пользователем.');
+    }
+
+    user.email = dto.newEmail;
+    user.isVerified = false;
+    await this.userRepository.save(user);
+
+    await this.emailConfirmationService.sendVerificationToken(user.email);
+
+    return {
+      message:
+        'Email успешно изменен. На новый адрес отправлено письмо для подтверждения.',
+    };
   }
 }

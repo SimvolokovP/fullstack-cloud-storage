@@ -12,7 +12,7 @@ import { MailModule } from '@/libs/mail/mail.module';
   imports: [
     TypeOrmModule.forFeature([Token]),
     MailModule,
-    UserModule,
+    forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
   ],
   controllers: [EmailConfirmationController],

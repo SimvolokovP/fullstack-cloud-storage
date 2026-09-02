@@ -18,7 +18,7 @@ import { getRecaptchaConfig } from '@/config/recaptcha.config';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Account, Token, User]),
-    UserModule,
+    forwardRef(() => UserModule),
     PassportModule.register({ session: true }),
     GoogleRecaptchaModule.forRootAsync({
       imports: [ConfigModule],
