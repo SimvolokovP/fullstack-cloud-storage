@@ -6,6 +6,8 @@ import { User } from './user/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { Account } from './auth/entities/account.entity';
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.util';
+import { EmailConfirmationModule } from './auth/email-confirmation/email-confirmation.module';
+import { Token } from './auth/entities/token.entity';
 
 @Module({
   imports: [
@@ -23,12 +25,13 @@ import { IS_DEV_ENV } from './libs/common/utils/is-dev.util';
         username: configService.get<string>('POSTGRES_USER'),
         password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DB'),
-        entities: [User, Account],
+        entities: [User, Account, Token],
         synchronize: IS_DEV_ENV,
       }),
     }),
     UserModule,
     AuthModule,
+    EmailConfirmationModule,
   ],
 })
 export class AppModule {}

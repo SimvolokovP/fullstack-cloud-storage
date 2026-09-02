@@ -13,7 +13,7 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Authorization } from 'src/auth/decorators/auth.decorator';
+import { Authorization } from '@/auth/decorators/auth.decorator';
 
 @ApiTags('Users')
 @Controller('users')

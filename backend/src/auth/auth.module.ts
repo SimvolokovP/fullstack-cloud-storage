@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Token } from './entities/token.entity';
@@ -8,10 +8,11 @@ import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getRecaptchaConfig } from 'src/config/recaptcha.config';
 import { PassportModule } from '@nestjs/passport';
 import { OAuthController } from './oauth.controller';
 import { YandexStrategy } from './strategies/yandex.strategy';
+import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
+import { getRecaptchaConfig } from '@/config/recaptcha.config';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { YandexStrategy } from './strategies/yandex.strategy';
       useFactory: getRecaptchaConfig,
       inject: [ConfigService],
     }),
+    forwardRef(() => EmailConfirmationModule),
   ],
   controllers: [AuthController, OAuthController],
   providers: [AuthService, YandexStrategy],

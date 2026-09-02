@@ -16,4 +16,9 @@ export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   isTwoFactorEnabled?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsBoolean()
+  @IsOptional()
+  isVerified?: boolean;
 }

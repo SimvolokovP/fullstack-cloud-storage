@@ -11,11 +11,12 @@ import { verify } from 'argon2';
 import { Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
 import { ConfigService } from '@nestjs/config';
-import { UserService } from 'src/user/user.service';
-import { User } from 'src/user/entities/user.entity';
+import { UserService } from '@/user/user.service';
+import { User } from '@/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Repository } from 'typeorm';
+import { EmailConfirmationService } from './email-confirmation/email-confirmation.service';
 
 @Injectable()
 export class AuthService {
@@ -24,9 +25,10 @@ export class AuthService {
     private readonly configService: ConfigService,
     @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
+    private readonly emailConfirmationService: EmailConfirmationService,
   ) {}
 
-  async register(req: Request, dto: RegisterDto) {
+  async register(dto: RegisterDto) {
     const isExists = await this.userService.findByEmail(dto.email);
 
     if (isExists) {
@@ -44,7 +46,12 @@ export class AuthService {
       isVerified: false,
     });
 
-    return this.saveSession(req, newUser);
+    await this.emailConfirmationService.sendVerificationToken(newUser.email);
+
+    return {
+      message:
+        'Вы успешно зарегистрировались. Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.',
+    };
   }
 
   async login(req: Request, dto: LoginDto) {
