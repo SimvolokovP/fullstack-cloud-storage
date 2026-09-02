@@ -54,10 +54,7 @@ export class AuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Неверный пароль или email не подтвержден',
   })
-  public async login(
-    @Req() req: Request,
-    @Body() dto: LoginDto,
-  ): Promise<User> {
+  public async login(@Req() req: Request, @Body() dto: LoginDto) {
     return this.authService.login(req, dto);
   }
 

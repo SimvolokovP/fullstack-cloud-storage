@@ -12,6 +12,7 @@ import { PassportModule } from '@nestjs/passport';
 import { OAuthController } from './oauth.controller';
 import { YandexStrategy } from './strategies/yandex.strategy';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
+import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
 import { getRecaptchaConfig } from '@/config/recaptcha.config';
 
 @Module({
@@ -25,6 +26,7 @@ import { getRecaptchaConfig } from '@/config/recaptcha.config';
       inject: [ConfigService],
     }),
     forwardRef(() => EmailConfirmationModule),
+    TwoFactorAuthModule,
   ],
   controllers: [AuthController, OAuthController],
   providers: [AuthService, YandexStrategy],

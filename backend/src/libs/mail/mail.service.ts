@@ -32,4 +32,16 @@ export class MailService {
       },
     );
   }
+
+  async sendTwoFactorTokenEmail(email: string, token: string): Promise<void> {
+    await this.mailQueue.add(
+      'send_two_factor',
+      { email, token },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+        removeOnComplete: true,
+      },
+    );
+  }
 }

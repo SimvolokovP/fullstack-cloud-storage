@@ -17,6 +17,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Repository } from 'typeorm';
 import { EmailConfirmationService } from './email-confirmation/email-confirmation.service';
+import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,7 @@ export class AuthService {
     @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
     private readonly emailConfirmationService: EmailConfirmationService,
+    private readonly twoFactorAuthService: TwoFactorAuthService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -73,6 +75,22 @@ export class AuthService {
     if (!user.isVerified) {
       throw new UnauthorizedException(
         'Ваш email не подтвержден. Пожалуйста, проверьте вашу почту и подтвердите адрес.',
+      );
+    }
+
+    if (user.isTwoFactorEnabled) {
+      if (!dto.code) {
+        await this.twoFactorAuthService.sendTwoFactorToken(user.email);
+
+        return {
+          message:
+            'Проверьте вашу почту. Требуется код двухфакторной аутентификации.',
+        };
+      }
+
+      await this.twoFactorAuthService.validateTwoFactorToken(
+        user.email,
+        dto.code,
       );
     }
 

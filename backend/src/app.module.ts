@@ -9,6 +9,7 @@ import { IS_DEV_ENV } from './libs/common/utils/is-dev.util';
 import { EmailConfirmationModule } from './auth/email-confirmation/email-confirmation.module';
 import { Token } from './auth/entities/token.entity';
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module';
+import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PasswordRecoveryModule } from './auth/password-recovery/password-recove
     AuthModule,
     EmailConfirmationModule,
     PasswordRecoveryModule,
+    TwoFactorAuthModule,
   ],
 })
 export class AppModule {}
