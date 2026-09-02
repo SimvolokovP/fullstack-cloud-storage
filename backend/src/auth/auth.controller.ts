@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/entities/user.entity';
+import { Recaptcha } from '@nestlab/google-recaptcha';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -23,6 +24,7 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
+  @Recaptcha()
   @Post('register')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Регистрация нового пользователя' })
@@ -42,6 +44,7 @@ export class AuthController {
     return this.authService.register(req, dto);
   }
 
+  @Recaptcha()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Авторизация пользователя' })

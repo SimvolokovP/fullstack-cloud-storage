@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@nestlab/google-recaptcha": "^3.11.3",
     "connect-redis": "^10.0.0",
     "express-session": "^1.19.0",
     "ioredis": "^6.0.0"
