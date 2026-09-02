@@ -20,4 +20,16 @@ export class MailService {
       },
     );
   }
+
+  async sendPasswordResetEmail(email: string, token: string): Promise<void> {
+    await this.mailQueue.add(
+      'send_password_reset',
+      { email, token },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+        removeOnComplete: true,
+      },
+    );
+  }
 }

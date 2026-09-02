@@ -8,6 +8,7 @@ import { Account } from './auth/entities/account.entity';
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.util';
 import { EmailConfirmationModule } from './auth/email-confirmation/email-confirmation.module';
 import { Token } from './auth/entities/token.entity';
+import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Token } from './auth/entities/token.entity';
     UserModule,
     AuthModule,
     EmailConfirmationModule,
+    PasswordRecoveryModule,
   ],
 })
 export class AppModule {}
