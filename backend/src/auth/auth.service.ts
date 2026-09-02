@@ -1,18 +1,27 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthMethod } from './enums/auth-method.enum';
 import { LoginDto } from './dto/login.dto';
+import { verify } from 'argon2';
+import { Request, Response } from 'express';
+import { Session, SessionData } from 'express-session';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  public constructor(private readonly userService: UserService) {}
+  public constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  async register(dto: RegisterDto) {
+  async register(req: Request, dto: RegisterDto) {
     const isExists = await this.userService.findByEmail(dto.email);
 
     if (isExists) {
@@ -30,15 +39,10 @@ export class AuthService {
       isVerified: false,
     });
 
-    // await this.emailConfirmationService.sendVerificationToken(newUser.email);
-
-    return {
-      message:
-        'Вы успешно зарегистрировались. Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.',
-    };
+    return this.saveSession(req, newUser);
   }
 
-  async login(dto: LoginDto) {
+  async login(req: Request, dto: LoginDto) {
     const user = await this.userService.findByEmail(dto.email);
 
     if (!user || !user.password) {
@@ -47,30 +51,64 @@ export class AuthService {
       );
     }
 
+    const isPasswordValid = await verify(user.password, dto.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(
+        'Неверный пароль. Пожалуйста, попробуйте еще раз или восстановите пароль, если забыли его.',
+      );
+    }
+
     if (!user.isVerified) {
-      //   await this.emailConfirmationService.sendVerificationToken(user.email);
       throw new UnauthorizedException(
         'Ваш email не подтвержден. Пожалуйста, проверьте вашу почту и подтвердите адрес.',
       );
     }
 
-    // if (user.isTwoFactorEnabled) {
-    //   if (!dto.code) {
-    //     await this.twoFactorAuthService.sendTwoFactorToken(user.email);
+    return this.saveSession(req, user);
+  }
 
-    //     return {
-    //       message:
-    //         'Проверьте вашу почту. Требуется код двухфакторной аутентификации.',
-    //     };
-    //   }
+  async logout(req: Request, res: Response): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      req.session.destroy((err) => {
+        if (err) {
+          return reject(
+            new InternalServerErrorException(
+              'Не удалось завершить сессию. Возможно, возникла проблема с сервером или сессия уже была завершена.',
+            ),
+          );
+        }
+        res.clearCookie(this.configService.getOrThrow<string>('SESSION_NAME'));
+        resolve();
+      });
+    });
+  }
 
-    //   await this.twoFactorAuthService.validateTwoFactorToken(
-    //     user.email,
-    //     dto.code,
-    //   );
-    // }
+  async saveSession(req: Request, user: User) {
+    const sessionRequest = req as Request & {
+      session?: Session & Partial<SessionData> & { userId?: string };
+    };
 
-    // return this.saveSession(req, user);
-    return user;
+    if (!sessionRequest.session) {
+      throw new InternalServerErrorException(
+        'Модуль сессий не инициализирован. Проверьте конфигурацию Redis и Express Session.',
+      );
+    }
+
+    return new Promise<User>((resolve, reject) => {
+      sessionRequest.session!.userId = user.id;
+
+      sessionRequest.session!.save((err: any) => {
+        if (err) {
+          console.error('Ошибка сохранения сессии в Redis:', err);
+
+          return reject(
+            new InternalServerErrorException(
+              `Не удалось保存 сессию в хранилище Redis: ${err.message || err}`,
+            ),
+          );
+        }
+        resolve(user);
+      });
+    });
   }
 }

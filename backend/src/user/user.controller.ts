@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Authorization } from 'src/auth/decorators/auth.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -38,6 +39,7 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'Пользователь не найден',
   })
+  @Authorization()
   async findById(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.userService.findById(id);
   }

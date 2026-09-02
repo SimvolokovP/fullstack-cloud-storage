@@ -29,6 +29,28 @@ async function bootstrap() {
     }),
   );
 
+  const sessionMaxAgeMs = ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE'));
+  const sessionTtlSeconds = Math.floor(sessionMaxAgeMs / 1000);
+
+  const redisStoreClient = {
+    get: async (key: string) => {
+      return await redis.get(key);
+    },
+    set: async (key: string, value: string, options?: { ttl?: number }) => {
+      if (options?.ttl) {
+        await redis.set(key, value, 'EX', options.ttl);
+      } else {
+        await redis.set(key, value);
+      }
+    },
+    del: async (key: string) => {
+      await redis.del(key);
+    },
+    expire: async (key: string, ttl: number) => {
+      await redis.expire(key, ttl);
+    },
+  };
+
   app.use(
     session({
       secret: config.getOrThrow<string>('SESSION_SECRET'),
@@ -37,14 +59,15 @@ async function bootstrap() {
       saveUninitialized: false,
       cookie: {
         domain: config.getOrThrow<string>('SESSION_DOMAIN'),
-        maxAge: ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE')),
+        maxAge: sessionMaxAgeMs,
         httpOnly: parseBoolean(config.getOrThrow<string>('SESSION_HTTP_ONLY')),
         secure: parseBoolean(config.getOrThrow<string>('SESSION_SECURE')),
         sameSite: 'lax',
       },
       store: new RedisStore({
-        client: redis,
+        client: redisStoreClient as any,
         prefix: config.getOrThrow<string>('SESSION_FOLDER'),
+        ttl: sessionTtlSeconds,
       }),
     }),
   );

@@ -4,11 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { AuthMethod } from 'src/auth/enums/auth-method.enum';
 import { hash } from 'argon2';
+import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -40,10 +39,12 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email },
       relations: { accounts: true },
     });
+
+    return user;
   }
 
   async create(dto: CreateUserDto) {
@@ -58,7 +59,7 @@ export class UserService {
       isVerified: dto.isVerified ?? false,
     });
 
-    return user;
+    return this.userRepository.save(user);
   }
 
   async update(userId: string, dto: UpdateUserDto) {
