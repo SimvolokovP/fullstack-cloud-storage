@@ -1,28 +1,23 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { render } from '@react-email/components';
-import { ConfirmationTemplate } from './templates/confirmation.template';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class MailService {
-  public constructor(
-    private readonly mailerService: MailerService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(@InjectQueue('mail_queue') private readonly mailQueue: Queue) {}
 
-  async sendConfirmationEmail(email: string, token: string) {
-    const domain = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
-    const html = await render(ConfirmationTemplate({ domain, token }));
-
-    return this.sendMail(email, 'Подтверждение почты', html);
-  }
-
-  private sendMail(email: string, subject: string, html: string) {
-    return this.mailerService.sendMail({
-      to: email,
-      subject,
-      html,
-    });
+  async sendConfirmationEmail(email: string, token: string): Promise<void> {
+    await this.mailQueue.add(
+      'send_confirmation',
+      { email, token },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: true,
+      },
+    );
   }
 }
