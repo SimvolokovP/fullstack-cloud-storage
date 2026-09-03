@@ -8,7 +8,7 @@ interface FileManagerListProps {
   items: IFileEntity[];
   isLoading: boolean;
   viewMode: "grid" | "list";
-  onFolderClick: (id: string) => void;
+  onFolderClick?: (id?: string) => void;
 }
 
 export function FileManagerList({
@@ -64,7 +64,9 @@ export function FileManagerList({
               <FolderCard
                 item={item}
                 onClick={
-                  item.isFolder ? () => onFolderClick(item.id) : undefined
+                  item.isFolder && onFolderClick
+                    ? () => onFolderClick(item.id)
+                    : undefined
                 }
                 dropdownTrigger={dropdownTrigger}
               />
@@ -81,10 +83,14 @@ export function FileManagerList({
         <FileActionWrapper key={item.id} item={item}>
           {({ dropdownTrigger }) => (
             <div
-              onClick={item.isFolder ? () => onFolderClick(item.id) : undefined}
+              onClick={
+                item.isFolder && onFolderClick
+                  ? () => onFolderClick(item.id)
+                  : undefined
+              }
               className={cn(
                 "group flex items-center justify-between p-3 text-sm hover:bg-secondary/30 transition-colors",
-                item.isFolder && "cursor-pointer",
+                item.isFolder && onFolderClick && "cursor-pointer",
               )}
             >
               <div className="flex items-center gap-4 min-w-0 flex-1">

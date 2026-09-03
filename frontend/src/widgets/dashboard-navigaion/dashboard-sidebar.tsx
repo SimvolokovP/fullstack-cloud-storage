@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight, CloudUpload, Settings } from "lucide-react";
+import { ChevronLeft, ChevronRight, CloudUpload } from "lucide-react";
 
 import { PAGES } from "@/shared/config/pages-url.config";
 import { SITE_NAME } from "@/shared/constants/seo.constants";
@@ -27,10 +27,7 @@ export function DashboardSidebar() {
           isCollapsed ? "justify-center px-2" : "px-4",
         )}
       >
-        <Link
-          href={PAGES.MAIN}
-          className="flex min-w-0 items-center gap-2"
-        >
+        <Link href={PAGES.MAIN} className="flex min-w-0 items-center gap-2">
           <CloudUpload />
 
           {!isCollapsed && (
@@ -75,19 +72,6 @@ export function DashboardSidebar() {
       </div>
 
       <div className="border-t border-border/60 p-2">
-        <Link
-          href={PAGES.DASHBOARD_SETTINGS}
-          title={isCollapsed ? "Настройки" : undefined}
-          className={cn(
-            "flex h-10 items-center gap-3 rounded-md text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground",
-            isCollapsed ? "justify-center px-2" : "px-3",
-          )}
-        >
-          <Settings className="size-4 shrink-0" strokeWidth={1.8} />
-
-          {!isCollapsed && <span>Настройки</span>}
-        </Link>
-
         <button
           type="button"
           onClick={() => toggle()}

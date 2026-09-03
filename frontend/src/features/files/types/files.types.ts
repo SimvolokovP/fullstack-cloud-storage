@@ -40,4 +40,5 @@ export interface IFilesQueryParams {
   order?: "ASC" | "DESC";
   page?: number;
   limit?: number;
+  isInTrash?: boolean;
 }

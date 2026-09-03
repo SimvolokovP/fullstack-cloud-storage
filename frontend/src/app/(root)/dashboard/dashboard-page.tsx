@@ -10,7 +10,7 @@ export function DashboardPage() {
       <div className="container">
         <DashboardGreeting />
         <StorageUsage />
-        <FileManager />
+        <FileManager isInTrash={false} />
       </div>
     </section>
   );

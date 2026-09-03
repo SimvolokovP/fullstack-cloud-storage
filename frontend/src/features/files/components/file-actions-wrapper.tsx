@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pencil, Trash2, MoreVertical } from "lucide-react";
+import { Pencil, Trash2, MoreVertical, RefreshCw } from "lucide-react";
 
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
@@ -31,6 +31,8 @@ import { RenameFileInput, renameFileSchema } from "../schemas/files.schema";
 import { useRenameFile } from "../hooks/use-rename-file";
 import { toastMessageHandler } from "@/shared/utils/toast-message-handler";
 import { useMoveToTrash } from "../hooks/use-move-to-trash";
+import { useDeleteForever } from "../hooks/use-delete-forever";
+import { useRestoreFromTrash } from "../hooks/use-restore-from-trash";
 
 interface FileActionWrapperProps {
   item: IFileEntity;
@@ -38,9 +40,9 @@ interface FileActionWrapperProps {
 }
 
 export function FileActionWrapper({ item, children }: FileActionWrapperProps) {
-  const [activeModal, setActiveModal] = useState<"rename" | "trash" | null>(
-    null,
-  );
+  const [activeModal, setActiveModal] = useState<
+    "rename" | "trash" | "restore" | "deleteForever" | null
+  >(null);
 
   const form = useForm<RenameFileInput>({
     resolver: zodResolver(renameFileSchema),
@@ -65,12 +67,38 @@ export function FileActionWrapper({ item, children }: FileActionWrapperProps) {
     onError: (message) => toastMessageHandler(message, "error"),
   });
 
+  const { mutate: restoreFromTrash, isPending: isRestorePending } =
+    useRestoreFromTrash({
+      onSuccess: () => {
+        toastMessageHandler("Объект успешно восстановлен.", "success");
+        setActiveModal(null);
+      },
+      onError: (message) => toastMessageHandler(message, "error"),
+    });
+
+  const { mutate: deleteForever, isPending: isDeleteForeverPending } =
+    useDeleteForever({
+      onSuccess: () => {
+        toastMessageHandler("Объект удален навсегда.", "success");
+        setActiveModal(null);
+      },
+      onError: (message) => toastMessageHandler(message, "error"),
+    });
+
   const onRenameSubmit = (data: RenameFileInput) => {
     renameFile({ id: item.id, name: data.name });
   };
 
   const handleMoveToTrash = () => {
     moveToTrash(item.id);
+  };
+
+  const handleRestore = () => {
+    restoreFromTrash(item.id);
+  };
+
+  const handleDeleteForever = () => {
+    deleteForever(item.id);
   };
 
   const dropdownTrigger = (
@@ -82,22 +110,43 @@ export function FileActionWrapper({ item, children }: FileActionWrapperProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-40 bg-background border border-border rounded-md p-1 shadow-md z-50"
+        className="w-44 bg-background border border-border rounded-md p-1 shadow-md z-50"
         onClick={(e) => e.stopPropagation()}
       >
-        <DropdownMenuItem
-          onClick={() => setActiveModal("rename")}
-          className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none hover:bg-muted"
-        >
-          <Pencil className="size-3.5" />
-          Переименовать
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setActiveModal("trash")}
-          className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none text-destructive hover:bg-destructive/10"
-        >
-          <Trash2 className="size-3.5" />В корзину
-        </DropdownMenuItem>
+        {item.isInTrash ? (
+          <>
+            <DropdownMenuItem
+              onClick={() => setActiveModal("restore")}
+              className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none hover:bg-muted"
+            >
+              <RefreshCw className="size-3.5" />
+              Восстановить
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setActiveModal("deleteForever")}
+              className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="size-3.5" />
+              Удалить навсегда
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuItem
+              onClick={() => setActiveModal("rename")}
+              className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none hover:bg-muted"
+            >
+              <Pencil className="size-3.5" />
+              Переименовать
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setActiveModal("trash")}
+              className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="size-3.5" />В корзину
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -186,6 +235,75 @@ export function FileActionWrapper({ item, children }: FileActionWrapperProps) {
               disabled={isTrashPending}
             >
               {isTrashPending ? "Удаление..." : "Удалить"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={activeModal === "restore"}
+        onOpenChange={() => setActiveModal(null)}
+      >
+        <DialogContent
+          className="sm:max-w-md"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <DialogTitle>Восстановить объект?</DialogTitle>
+            <DialogDescription>
+              «{item.name}» вернется в свое исходное расположение.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+            <Button
+              variant="ghost"
+              onClick={() => setActiveModal(null)}
+              disabled={isRestorePending}
+            >
+              Отмена
+            </Button>
+            <Button
+              onClick={handleRestore}
+              disabled={isRestorePending}
+              className="bg-foreground text-background hover:bg-foreground/90"
+            >
+              {isRestorePending ? "Восстановление..." : "Восстановить"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={activeModal === "deleteForever"}
+        onOpenChange={() => setActiveModal(null)}
+      >
+        <DialogContent
+          className="sm:max-w-md"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-destructive">
+              Удалить окончательно?
+            </DialogTitle>
+            <DialogDescription>
+              Вы уверены, что хотите навсегда удалить «{item.name}»? Это
+              действие нельзя отменить.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+            <Button
+              variant="ghost"
+              onClick={() => setActiveModal(null)}
+              disabled={isDeleteForeverPending}
+            >
+              Отмена
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteForever}
+              disabled={isDeleteForeverPending}
+            >
+              {isDeleteForeverPending ? "Удаление..." : "Удалить навсегда"}
             </Button>
           </DialogFooter>
         </DialogContent>

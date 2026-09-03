@@ -48,11 +48,11 @@ export class FilesController {
 
   @Get()
   @ApiOperation({
-    summary: 'Получить содержимое текущей директории с пагинацией',
+    summary: 'Получить содержимое директории или корзины с пагинацией',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Успешное получение списка файлов',
+    description: 'Успешное получение списка объектов',
   })
   @Authorization()
   async getFiles(
@@ -60,14 +60,6 @@ export class FilesController {
     @Query() queryDto: FilesQueryDto,
   ): Promise<PaginatedFilesResponse> {
     return this.filesService.getFiles(userId, queryDto);
-  }
-
-  @Get('trash')
-  @ApiOperation({ summary: 'Получить список объектов в корзине' })
-  @ApiResponse({ status: HttpStatus.OK, type: [FileEntity] })
-  @Authorization()
-  async getTrash(@Authorized('id') userId: string): Promise<FileEntity[]> {
-    return this.filesService.getTrash(userId);
   }
 
   @Patch(':id/trash')

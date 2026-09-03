@@ -9,15 +9,15 @@ export const NAVIGATION = [
   },
 
   {
-    title: "Недавние",
-    href: PAGES.DASHBOARD_RECENT,
-    icon: Clock3,
-  },
-
-  {
     title: "Корзина",
     href: PAGES.DASHBOARD_TRASH,
     icon: Trash2,
+  },
+
+  {
+    title: "Настройки",
+    href: PAGES.DASHBOARD_SETTINGS,
+    icon: Settings,
   },
 ];
 

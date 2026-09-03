@@ -46,21 +46,31 @@ export class FilesService {
     userId: string,
     queryDto: FilesQueryDto,
   ): Promise<PaginatedFilesResponse> {
-    const { parentId, search, sortBy, order, page = 1, limit = 20 } = queryDto;
+    const {
+      parentId,
+      search,
+      sortBy,
+      order,
+      page = 1,
+      limit = 20,
+      isInTrash = false,
+    } = queryDto;
 
     const queryBuilder = this.fileRepository
       .createQueryBuilder('file')
       .where('file.owner_id = :userId', { userId })
-      .andWhere('file.is_in_trash = :isInTrash', { isInTrash: false });
+      .andWhere('file.is_in_trash = :isInTrash', { isInTrash });
 
     if (search) {
       queryBuilder.andWhere('file.name ILIKE :search', {
         search: `%${search}%`,
       });
-    } else if (parentId) {
-      queryBuilder.andWhere('file.parent_id = :parentId', { parentId });
-    } else {
-      queryBuilder.andWhere('file.parent_id IS NULL');
+    } else if (!isInTrash) {
+      if (parentId) {
+        queryBuilder.andWhere('file.parent_id = :parentId', { parentId });
+      } else {
+        queryBuilder.andWhere('file.parent_id IS NULL');
+      }
     }
 
     const sortColumn =
@@ -89,13 +99,6 @@ export class FilesService {
         currentPage: page,
       },
     };
-  }
-
-  async getTrash(userId: string): Promise<FileEntity[]> {
-    return this.fileRepository.find({
-      where: { owner: { id: userId }, isInTrash: true },
-      order: { deletedAt: 'DESC' },
-    });
   }
 
   async moveToTrash(id: string, userId: string): Promise<{ success: boolean }> {

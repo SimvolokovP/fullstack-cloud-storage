@@ -7,8 +7,9 @@ import {
   IsInt,
   Min,
   Max,
+  IsBoolean,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export enum FilesSortFields {
   NAME = 'name',
@@ -56,4 +57,10 @@ export class FilesQueryDto {
   @Max(100)
   @IsOptional()
   limit?: number = 20;
+
+  @ApiPropertyOptional({ default: false })
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  @IsOptional()
+  isInTrash?: boolean = false;
 }

@@ -9,8 +9,10 @@ export const useFiles = (queryParams?: IFilesQueryParams) => {
       queryParams?.parentId || "root",
       queryParams?.search || "",
       queryParams?.sortBy || "name",
+      queryParams?.order || "ASC",
       queryParams?.page || 1,
       queryParams?.limit || 20,
+      queryParams?.isInTrash ?? false,
     ],
     queryFn: () => filesService.getFiles(queryParams),
   });

@@ -14,6 +14,13 @@ export const filesService = {
     return response.data;
   },
 
+  async getTrash(queryParams?: IFilesQueryParams) {
+    const response = await AUTH_API.get<IPaginatedFiles>("/files/trash", {
+      params: queryParams,
+    });
+    return response.data;
+  },
+
   async createFolder(data: CreateFolderDto) {
     const response = await AUTH_API.post<IFileEntity>("/files/folder", data);
     return response.data;
