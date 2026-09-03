@@ -10,6 +10,9 @@ import { EmailConfirmationModule } from './auth/email-confirmation/email-confirm
 import { Token } from './auth/entities/token.entity';
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module';
 import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module';
+import { TariffsModule } from './tariffs/tariffs.module';
+import { TariffPlan } from './tariffs/entities/tariff-plan.entity';
+import { FileEntity } from './files/entities/file.entity';
 
 @Module({
   imports: [
@@ -27,7 +30,7 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
         username: configService.get<string>('POSTGRES_USER'),
         password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DB'),
-        entities: [User, Account, Token],
+        entities: [User, Account, Token, TariffPlan, FileEntity],
         synchronize: IS_DEV_ENV,
       }),
     }),
@@ -36,6 +39,7 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
     EmailConfirmationModule,
     PasswordRecoveryModule,
     TwoFactorAuthModule,
+    TariffsModule,
   ],
 })
 export class AppModule {}

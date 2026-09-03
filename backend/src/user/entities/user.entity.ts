@@ -5,11 +5,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../enums/user-role.enum';
 import { AuthMethod } from '../../auth/enums/auth-method.enum';
 import { Account } from '../../auth/entities/account.entity';
+import { FileEntity } from '../../files/entities/file.entity';
+import { TariffPlan } from '../../tariffs/entities/tariff-plan.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -53,8 +57,23 @@ export class User {
   @Column({ type: 'enum', enum: AuthMethod })
   method!: AuthMethod;
 
+  @ApiProperty({ example: 5368709120 })
+  @Column({ type: 'bigint', name: 'allocated_space', default: 5368709120 })
+  allocatedSpace!: number;
+
+  @ApiProperty({ example: 1048576 })
+  @Column({ type: 'bigint', name: 'used_space', default: 0 })
+  usedSpace!: number;
+
+  @ManyToOne(() => TariffPlan, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'tariff_plan_id' })
+  tariffPlan!: TariffPlan | null;
+
   @OneToMany(() => Account, (account) => account.user)
   accounts!: Account[];
+
+  @OneToMany(() => FileEntity, (file) => file.owner)
+  files!: FileEntity[];
 
   @ApiProperty({ example: '2026-09-01T15:00:00.000Z' })
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })

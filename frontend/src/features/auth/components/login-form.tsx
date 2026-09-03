@@ -28,11 +28,17 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/shared/ui/input-otp";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useTheme } from "next-themes";
 
 export function LoginForm() {
+  const { theme } = useTheme();
+
   const router = useRouter();
   const [isTwoFactorRequired, setIsTwoFactorRequired] =
     useState<boolean>(false);
+
+  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
 
   const form = useForm<ILoginCredentials>({
     resolver: zodResolver(loginSchema),
@@ -154,6 +160,14 @@ export function LoginForm() {
             )}
           />
         )}
+
+        <div className="flex justify-center">
+          {/* <ReCAPTCHA
+            sitekey={process.env.GOOGLE_RECAPTCHA_SITE_KEY as string || "6LfMsqQtAAAAACe3KMj7z9b-jV3Ace15GffPNfZo"}
+            onChange={setRecaptchaValue}
+            theme={theme === "light" ? "light" : "dark"}
+          /> */}
+        </div>
 
         <Button type="submit" className="w-full" disabled={isLoginPending}>
           {isLoginPending
