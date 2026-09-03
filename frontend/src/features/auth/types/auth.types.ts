@@ -1,3 +1,5 @@
+import { ITariffPlan } from "@/features/tariffs/types/tariffs.types";
+
 export type UserRole = "REGULAR" | "ADMIN";
 export type AuthMethod = "CREDENTIALS" | "GOOGLE" | "YANDEX";
 
@@ -14,6 +16,9 @@ export interface IUser {
   picture: string | null;
   role: UserRole;
   isVerified: boolean;
+  allocatedSpace: number;
+  usedSpace: number;
+  tariffPlan: ITariffPlan | null;
   isTwoFactorEnabled: boolean;
   method: AuthMethod;
   createdAt: string;
