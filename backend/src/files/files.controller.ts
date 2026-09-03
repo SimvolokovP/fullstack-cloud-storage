@@ -101,4 +101,17 @@ export class FilesController {
   ): Promise<FileEntity> {
     return this.filesService.rename(id, userId, dto);
   }
+
+  @Get(':id/breadcrumbs')
+  @ApiOperation({
+    summary: 'Получить цепочку родительских папок для хлебных крошек',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: [FileEntity] })
+  @Authorization()
+  async getBreadcrumbs(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Authorized('id') userId: string,
+  ): Promise<FileEntity[]> {
+    return this.filesService.getBreadcrumbs(id, userId);
+  }
 }

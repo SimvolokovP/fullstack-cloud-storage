@@ -32,4 +32,11 @@ export const filesService = {
     );
     return response.data;
   },
+
+  async getBreadcrumbs(id: string) {
+    const response = await AUTH_API.get<IFileEntity[]>(
+      `/files/${id}/breadcrumbs`,
+    );
+    return response.data;
+  },
 };

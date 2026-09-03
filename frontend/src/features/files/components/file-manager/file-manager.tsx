@@ -18,12 +18,16 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/shared/ui/drawer";
+import { FilesBreadcrumbs } from "../files-breadcrumbs";
 
 interface FileManagerProps {
   parentId?: string;
 }
 
-export function FileManager({ parentId }: FileManagerProps) {
+export function FileManager({ parentId: initialParentId }: FileManagerProps) {
+  const [currentFolderId, setCurrentFolderId] = useState<string | undefined>(
+    initialParentId,
+  );
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<SortOption>("name");
   const [search, setSearch] = useState<string>("");
@@ -42,7 +46,7 @@ export function FileManager({ parentId }: FileManagerProps) {
   };
 
   const { data, isLoading } = useFiles({
-    parentId,
+    parentId: currentFolderId,
     search: debouncedSearch,
     sortBy: serverSortByMap[sortBy],
     order: sortBy === "date" ? "DESC" : "ASC",
@@ -77,6 +81,12 @@ export function FileManager({ parentId }: FileManagerProps) {
     setIsCreateFolderOpen(true);
   };
 
+  const handleNavigate = (id?: string) => {
+    setCurrentFolderId(id);
+    setPage(1);
+    setSearch("");
+  };
+
   return (
     <div className="mt-8 space-y-6">
       <FileManagerToolbar
@@ -91,15 +101,17 @@ export function FileManager({ parentId }: FileManagerProps) {
         onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
       />
 
-      <div>
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Файлы
-        </h3>
+      <div className="flex flex-col gap-2">
+        <FilesBreadcrumbs
+          currentId={currentFolderId}
+          onNavigate={handleNavigate}
+        />
 
         <FileManagerList
           items={data?.items || []}
           isLoading={isLoading}
           viewMode={viewMode}
+          onFolderClick={handleNavigate}
         />
       </div>
 
@@ -112,7 +124,7 @@ export function FileManager({ parentId }: FileManagerProps) {
       )}
 
       <CreateFolderDialog
-        parentId={parentId}
+        parentId={currentFolderId}
         open={isCreateFolderOpen}
         onOpenChange={setIsCreateFolderOpen}
       />

@@ -179,4 +179,22 @@ export class FilesService {
 
     return this.fileRepository.save(file);
   }
+
+  async getBreadcrumbs(id: string, userId: string): Promise<FileEntity[]> {
+    const breadcrumbs: FileEntity[] = [];
+    let currentId: string | null = id;
+
+    while (currentId) {
+      const folder = await this.fileRepository.findOne({
+        where: { id: currentId, owner: { id: userId }, isFolder: true },
+      });
+
+      if (!folder) break;
+
+      breadcrumbs.unshift(folder);
+      currentId = folder.parentId;
+    }
+
+    return breadcrumbs;
+  }
 }
