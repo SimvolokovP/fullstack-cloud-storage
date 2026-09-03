@@ -9,7 +9,7 @@ export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
     super({
       clientID: configService.getOrThrow<string>('YANDEX_CLIENT_ID'),
       clientSecret: configService.getOrThrow<string>('YANDEX_CLIENT_SECRET'),
-      callbackURL: `${configService.getOrThrow<string>('ALLOWED_ORIGIN')}/api/auth/oauth/callback/yandex`,
+      callbackURL: 'http://localhost:4000/api/auth/oauth/callback/yandex',
     });
   }
 
@@ -19,7 +19,7 @@ export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
     profile: any,
     done: any,
   ): Promise<any> {
-    const { displayName, emails, photos } = profile;
+    const { displayName, emails, photos, _json } = profile;
 
     const user = {
       email: emails?.[0]?.value,
@@ -27,6 +27,7 @@ export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
       picture: photos?.[0]?.value,
       accessToken,
       refreshToken,
+      expiresIn: _json?.expires_in || 31536000,
     };
 
     done(null, user);

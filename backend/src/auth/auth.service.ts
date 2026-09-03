@@ -152,6 +152,7 @@ export class AuthService {
     picture: string | null;
     accessToken: string;
     refreshToken: string;
+    expiresIn: number;
   }): Promise<User> {
     let user = await this.userService.findByEmail(oauthUser.email);
 
@@ -166,6 +167,10 @@ export class AuthService {
       });
     }
 
+    const expiresAtTimestamp = Math.floor(
+      (Date.now() + oauthUser.expiresIn * 1000) / 1000,
+    );
+
     let account = await this.accountRepository.findOne({
       where: {
         provider: 'yandex',
@@ -176,6 +181,7 @@ export class AuthService {
     if (account) {
       account.accessToken = oauthUser.accessToken;
       account.refreshToken = oauthUser.refreshToken;
+      account.expiresAt = expiresAtTimestamp;
       await this.accountRepository.save(account);
     } else {
       account = this.accountRepository.create({
@@ -183,11 +189,24 @@ export class AuthService {
         provider: 'yandex',
         accessToken: oauthUser.accessToken,
         refreshToken: oauthUser.refreshToken,
+        expiresAt: expiresAtTimestamp,
         userId: user.id,
       });
       await this.accountRepository.save(account);
     }
 
     return user;
+  }
+
+  async handleYandexCallback(req: Request & { user?: any }, res: Response) {
+    if (!req.user) {
+      throw new UnauthorizedException('Данные от Яндекс OAuth не получены.');
+    }
+
+    const user = await this.validateOAuthUser(req.user);
+    await this.saveSession(req, user);
+
+    const frontendUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
+    return res.redirect(`${frontendUrl}/dashboard`);
   }
 }
