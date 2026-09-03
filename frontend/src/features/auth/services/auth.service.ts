@@ -68,4 +68,9 @@ export const authService = {
     const response = await AUTH_API.patch<void>(`/users/${id}/email`, data);
     return response.data;
   },
+
+  async getMe() {
+    const response = await AUTH_API.get<IUser>("/auth/me");
+    return response.data;
+  },
 };

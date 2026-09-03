@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -74,5 +76,23 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     return this.authService.logout(req, res);
+  }
+
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Получить данные текущего авторизованного пользователя',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: User,
+    description: 'Данные профиля успешно извлечены из текущей сессии',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Пользователь не авторизован (сессия отсутствует или истекла)',
+  })
+  public async getMe(@Req() req: Request): Promise<User> {
+    return this.authService.getMe(req);
   }
 }

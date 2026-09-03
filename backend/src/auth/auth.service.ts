@@ -209,4 +209,16 @@ export class AuthService {
     const frontendUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
     return res.redirect(`${frontendUrl}/dashboard`);
   }
+
+  async getMe(req: Request): Promise<User> {
+    const sessionRequest = req as Request & { session?: { userId?: string } };
+
+    if (!sessionRequest.session?.userId) {
+      throw new UnauthorizedException(
+        'Вы не авторизованы. Пожалуйста, войдите в систему для доступа к этой информации.',
+      );
+    }
+
+    return this.userService.findById(sessionRequest.session.userId);
+  }
 }
