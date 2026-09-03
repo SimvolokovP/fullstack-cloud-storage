@@ -23,12 +23,6 @@ export function TariffCard({ tariff, user }: TariffCardProps) {
     <div
       className={`relative flex h-full flex-col rounded-2xl border bg-card/60 p-6 shadow-xl backdrop-blur-xl transition-colors hover:bg-card/90 border-border/60`}
     >
-      {isCurrent && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-foreground px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-background">
-          Текущий тариф
-        </div>
-      )}
-
       <div className="mb-5">
         <h3 className="text-xl font-bold tracking-tight">{tariff.name}</h3>
         <p className="mt-2 min-h-10 text-xs text-muted-foreground leading-normal">
