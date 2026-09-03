@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useGetMe } from "../hooks/use-get-me";
 import { ProfileSettingsRow } from "./profile-settings-row";
 import { LogOut, KeyRound, AtSign } from "lucide-react";
-import { ConfirmLogoutDialog } from "../hooks/confirm-logout-dialog";
-import { ChangePasswordDialog } from "../hooks/change-password-dialog";
-import { ChangeEmailDialog } from "../hooks/change-email-dialog";
+import { ConfirmLogoutDialog } from "./confirm-logout-dialog";
+import { ChangePasswordDialog } from "./change-password-dialog";
+import { ChangeEmailDialog } from "./change-email-dialog";
 
 export function ProfileSecurity() {
   const { data: user } = useGetMe();

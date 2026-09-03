@@ -1,6 +1,5 @@
 import { API, AUTH_API } from "@/shared/api/api.config";
 import {
-  IAuthResponse,
   ILoginCredentials,
   IRegisterCredentials,
   IUser,
@@ -8,6 +7,7 @@ import {
   IChangePasswordCredentials,
   IChangeEmailCredentials,
   IRegisterResponse,
+  LoginResponse,
 } from "../types/auth.types";
 
 export const authService = {
@@ -17,7 +17,7 @@ export const authService = {
   },
 
   async login(data: ILoginCredentials) {
-    const response = await API.post<IAuthResponse>("/auth/login", data);
+    const response = await API.post<LoginResponse>("/auth/login", data);
     return response.data;
   },
 

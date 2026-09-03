@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import { useLogout } from "./use-logout";
+import { useLogout } from "../hooks/use-logout";
 
 interface ConfirmLogoutDialogProps {
   open: boolean;

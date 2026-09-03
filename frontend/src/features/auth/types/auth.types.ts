@@ -1,6 +1,12 @@
 export type UserRole = "REGULAR" | "ADMIN";
 export type AuthMethod = "CREDENTIALS" | "GOOGLE" | "YANDEX";
 
+export interface ITwoFactorResponse {
+  message: string;
+}
+
+export type LoginResponse = IAuthResponse | ITwoFactorResponse;
+
 export interface IUser {
   id: string;
   email: string;

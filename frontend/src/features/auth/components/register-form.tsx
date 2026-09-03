@@ -32,7 +32,7 @@ export function RegisterForm() {
 
   const { mutate, isPending } = useRegister({
     onSuccess: (response) => {
-      toastMessageHandler(response.message);
+      toastMessageHandler(response.message, "success");
       router.push(PAGES.LOGIN || "/auth/login");
     },
     onError: (message) => {
