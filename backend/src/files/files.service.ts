@@ -15,6 +15,7 @@ import {
   SortOrder,
 } from './dto/files-query.dto';
 import { PaginatedFilesResponse } from './entities/paginated-files';
+import { RenameFileDto } from './dto/rename-file.dto';
 
 @Injectable()
 export class FilesService {
@@ -149,5 +150,33 @@ export class FilesService {
         await this.toggleTrashStateRecursive(child, isInTrash);
       }
     }
+  }
+
+  async rename(
+    id: string,
+    userId: string,
+    dto: RenameFileDto,
+  ): Promise<FileEntity> {
+    const file = await this.fileRepository.findOne({
+      where: { id, owner: { id: userId } },
+    });
+    if (!file) {
+      throw new NotFoundException('Объект не найден');
+    }
+
+    if (file.isFolder) {
+      file.name = dto.name;
+    } else {
+      const oldExtension = file.name.split('.').pop();
+      const newExtension = dto.name.split('.').pop();
+
+      if (oldExtension && oldExtension !== newExtension) {
+        file.name = `${dto.name}.${oldExtension}`;
+      } else {
+        file.name = dto.name;
+      }
+    }
+
+    return this.fileRepository.save(file);
   }
 }

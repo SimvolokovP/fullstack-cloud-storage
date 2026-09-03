@@ -28,6 +28,7 @@ import { Authorized } from '@/auth/decorators/authorized.decorator';
 import { User } from '../user/entities/user.entity';
 import { FilesQueryDto } from './dto/files-query.dto';
 import { PaginatedFilesResponse } from './entities/paginated-files';
+import { RenameFileDto } from './dto/rename-file.dto';
 
 @ApiTags('Files Manager')
 @Controller('files')
@@ -87,5 +88,17 @@ export class FilesController {
     @Authorized('id') userId: string,
   ) {
     return this.filesService.restoreFromTrash(id, userId);
+  }
+
+  @Patch(':id/rename')
+  @ApiOperation({ summary: 'Переименовать файл или папку' })
+  @ApiResponse({ status: HttpStatus.OK, type: FileEntity })
+  @Authorization()
+  async rename(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Authorized('id') userId: string,
+    @Body() dto: RenameFileDto,
+  ): Promise<FileEntity> {
+    return this.filesService.rename(id, userId, dto);
   }
 }

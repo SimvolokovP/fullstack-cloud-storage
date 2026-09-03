@@ -8,3 +8,9 @@ export const createFolderSchema = z.object({
 });
 
 export type CreateFolderInput = z.infer<typeof createFolderSchema>;
+
+export const renameFileSchema = z.object({
+  name: z.string().min(1, { message: "Название не может быть пустым" }).max(100),
+});
+
+export type RenameFileInput = z.infer<typeof renameFileSchema>;
