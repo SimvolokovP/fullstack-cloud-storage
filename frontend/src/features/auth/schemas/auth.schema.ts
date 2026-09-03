@@ -43,3 +43,26 @@ export const resetPasswordSchema = z
   });
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2, { message: "Имя должно быть не менее 2 символов" }),
+  isTwoFactorEnabled: z.boolean(),
+});
+
+export const changePasswordSchema = z.object({
+  oldPassword: z
+    .string()
+    .min(6, { message: "Пароль должен быть не менее 6 символов" }),
+  newPassword: z
+    .string()
+    .min(6, { message: "Пароль должен быть не менее 6 символов" }),
+});
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+export const changeEmailSchema = z.object({
+  newEmail: z.string().email({ message: "Некорректный email" }),
+});
+
+export type ChangeEmailInput = z.infer<typeof changeEmailSchema>;

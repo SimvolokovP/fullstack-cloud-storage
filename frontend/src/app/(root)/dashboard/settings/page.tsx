@@ -1,9 +1,10 @@
 import { Metadata } from "next";
+import { SettingsPage } from "./settings-page";
 
 export const metadata: Metadata = {
-  title: "Панель управления",
+  title: "Настройки",
 };
 
 export default function Page() {
-  return <div>dashboard</div>;
+  return <SettingsPage />;
 }
