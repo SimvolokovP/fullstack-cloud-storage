@@ -22,6 +22,12 @@ import {
   FormMessage,
 } from "@/shared/ui/form";
 import { toastMessageHandler } from "@/shared/utils/toast-message-handler";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/shared/ui/input-otp";
 
 export function LoginForm() {
   const router = useRouter();
@@ -121,15 +127,27 @@ export function LoginForm() {
             control={form.control}
             name="code"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Код подтверждения</FormLabel>
+              <FormItem className="flex flex-col items-center justify-center text-center">
+                <FormLabel className="mb-2">Код подтверждения 2FA</FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="123456"
+                  <InputOTP
+                    maxLength={6}
                     disabled={isLoginPending}
-                    {...field}
-                  />
+                    value={field.value}
+                    onChange={field.onChange}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
                 </FormControl>
                 <FormMessage />
               </FormItem>

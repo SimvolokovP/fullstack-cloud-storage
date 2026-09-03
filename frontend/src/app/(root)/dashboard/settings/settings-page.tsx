@@ -12,7 +12,7 @@ export function SettingsPage() {
     return (
       <div className="container space-y-8 py-4">
         <Skeleton className="h-10 w-48" />
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-1">
           <Skeleton className="h-75 rounded-xl" />
           <Skeleton className="h-75 rounded-xl" />
         </div>
