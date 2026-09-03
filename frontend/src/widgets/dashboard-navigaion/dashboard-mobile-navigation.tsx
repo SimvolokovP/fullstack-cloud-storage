@@ -7,14 +7,15 @@ import { useState } from "react";
 
 import { cn } from "@/shared/lib/utils";
 
-import { NAVIGATION } from "./navigation";
+import { MOBILE_NAVIGATION } from "./navigation";
 
 export function DashboardMobileNavigation() {
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const activeItem =
-    NAVIGATION.find((item) => item.href === pathname) ?? NAVIGATION[0];
+    MOBILE_NAVIGATION.find((item) => item.href === pathname) ??
+    MOBILE_NAVIGATION[0];
 
   const ActiveIcon = activeItem.icon;
 
@@ -29,7 +30,7 @@ export function DashboardMobileNavigation() {
         {isExpanded ? (
           <>
             <div className="flex items-center gap-1">
-              {NAVIGATION.map((item) => {
+              {MOBILE_NAVIGATION.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
 
