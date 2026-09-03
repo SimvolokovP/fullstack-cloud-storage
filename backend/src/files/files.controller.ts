@@ -26,6 +26,8 @@ import { CreateFolderDto } from './dto/create-folder.dto';
 import { Authorization } from '@/auth/decorators/auth.decorator';
 import { Authorized } from '@/auth/decorators/authorized.decorator';
 import { User } from '../user/entities/user.entity';
+import { FilesQueryDto } from './dto/files-query.dto';
+import { PaginatedFilesResponse } from './entities/paginated-files';
 
 @ApiTags('Files Manager')
 @Controller('files')
@@ -44,15 +46,19 @@ export class FilesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Получить содержимое текущей директории' })
-  @ApiQuery({ name: 'parentId', required: false })
-  @ApiResponse({ status: HttpStatus.OK, type: [FileEntity] })
+  @ApiOperation({
+    summary: 'Получить содержимое текущей директории с пагинацией',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Успешное получение списка файлов',
+  })
   @Authorization()
   async getFiles(
     @Authorized('id') userId: string,
-    @Query('parentId') parentId?: string,
-  ): Promise<FileEntity[]> {
-    return this.filesService.getFiles(userId, parentId);
+    @Query() queryDto: FilesQueryDto,
+  ): Promise<PaginatedFilesResponse> {
+    return this.filesService.getFiles(userId, queryDto);
   }
 
   @Get('trash')

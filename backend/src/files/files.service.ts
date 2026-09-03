@@ -9,6 +9,12 @@ import { Repository, IsNull } from 'typeorm';
 import { FileEntity } from './entities/file.entity';
 import { User } from '../user/entities/user.entity';
 import { CreateFolderDto } from './dto/create-folder.dto';
+import {
+  FilesQueryDto,
+  FilesSortFields,
+  SortOrder,
+} from './dto/files-query.dto';
+import { PaginatedFilesResponse } from './entities/paginated-files';
 
 @Injectable()
 export class FilesService {
@@ -35,15 +41,53 @@ export class FilesService {
     return this.fileRepository.save(folder);
   }
 
-  async getFiles(userId: string, parentId?: string): Promise<FileEntity[]> {
-    return this.fileRepository.find({
-      where: {
-        owner: { id: userId },
-        parentId: parentId ? parentId : IsNull(),
-        isInTrash: false,
+  async getFiles(
+    userId: string,
+    queryDto: FilesQueryDto,
+  ): Promise<PaginatedFilesResponse> {
+    const { parentId, search, sortBy, order, page = 1, limit = 20 } = queryDto;
+
+    const queryBuilder = this.fileRepository
+      .createQueryBuilder('file')
+      .where('file.owner_id = :userId', { userId })
+      .andWhere('file.is_in_trash = :isInTrash', { isInTrash: false });
+
+    if (search) {
+      queryBuilder.andWhere('file.name ILIKE :search', {
+        search: `%${search}%`,
+      });
+    } else if (parentId) {
+      queryBuilder.andWhere('file.parent_id = :parentId', { parentId });
+    } else {
+      queryBuilder.andWhere('file.parent_id IS NULL');
+    }
+
+    const sortColumn =
+      sortBy === FilesSortFields.SIZE
+        ? 'file.size'
+        : sortBy === FilesSortFields.DATE
+          ? 'file.created_at'
+          : 'file.name';
+
+    queryBuilder
+      .orderBy('file.is_folder', 'DESC')
+      .addOrderBy(sortColumn, order || SortOrder.ASC)
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [items, totalItems] = await queryBuilder.getManyAndCount();
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      items,
+      meta: {
+        totalItems,
+        itemCount: items.length,
+        itemsPerPage: limit,
+        totalPages,
+        currentPage: page,
       },
-      order: { isFolder: 'DESC', createdAt: 'DESC' },
-    });
+    };
   }
 
   async getTrash(userId: string): Promise<FileEntity[]> {
