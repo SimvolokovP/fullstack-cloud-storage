@@ -13,6 +13,7 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
 import { TariffsModule } from './tariffs/tariffs.module';
 import { TariffPlan } from './tariffs/entities/tariff-plan.entity';
 import { FileEntity } from './files/entities/file.entity';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { FileEntity } from './files/entities/file.entity';
     PasswordRecoveryModule,
     TwoFactorAuthModule,
     TariffsModule,
+    FilesModule,
   ],
 })
 export class AppModule {}

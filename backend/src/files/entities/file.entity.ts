@@ -16,21 +16,24 @@ export class FileEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ApiProperty({ example: 'vacation_photo.png' })
+  @ApiProperty({ example: 'documents' })
   @Column({ type: 'varchar' })
   name!: string;
 
-  @ApiProperty({ example: 'users/86e378de/vacation_photo.png' })
-  @Column({ type: 'varchar', name: 's3_key', unique: true })
-  s3Key!: string;
+  @ApiProperty({
+    example: 'users/86e378de/documents/report.pdf',
+    nullable: true,
+  })
+  @Column({ type: 'varchar', name: 's3_key', unique: true, nullable: true })
+  s3Key!: string | null;
 
   @ApiProperty({ example: 2048576 })
-  @Column({ type: 'bigint' })
+  @Column({ type: 'bigint', default: 0 })
   size!: number;
 
-  @ApiProperty({ example: 'image/png' })
-  @Column({ type: 'varchar', name: 'mime_type' })
-  mimeType!: string;
+  @ApiProperty({ example: 'application/pdf', nullable: true })
+  @Column({ type: 'varchar', name: 'mime_type', nullable: true })
+  mimeType!: string | null;
 
   @ApiProperty({ example: false })
   @Column({ type: 'boolean', name: 'is_folder', default: false })
@@ -44,6 +47,10 @@ export class FileEntity {
   @Column({ type: 'uuid', name: 'parent_id', nullable: true })
   parentId!: string | null;
 
+  @ApiProperty({ example: false })
+  @Column({ type: 'boolean', name: 'is_in_trash', default: false })
+  isInTrash!: boolean;
+
   @ManyToOne(() => User, (user) => user.files, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'owner_id' })
   owner!: User;
@@ -55,4 +62,8 @@ export class FileEntity {
   @ApiProperty({ example: '2026-09-01T15:05:00.000Z' })
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
   updatedAt!: Date;
+
+  @ApiProperty({ example: '2026-09-02T10:00:00.000Z', nullable: true })
+  @Column({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  deletedAt!: Date | null;
 }
