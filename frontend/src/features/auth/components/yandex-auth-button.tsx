@@ -13,7 +13,7 @@ export function YandexAuthButton() {
       const backendUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
       setIsLoading(true);
-      window.location.href = `${backendUrl}/auth/oauth/connect/yandex`;
+      window.location.href = `${backendUrl}/api/auth/oauth/connect/yandex`;
     } catch (error) {
       console.error(error);
       setIsLoading(false);
