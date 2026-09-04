@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Download,
   FolderUp,
+  Eye,
 } from "lucide-react";
 
 import {
@@ -33,6 +34,8 @@ import { useMoveFile } from "../../hooks/use-move-file";
 interface FileActionWrapperProps {
   item: IFileEntity;
   parentFolderParentId?: string | null;
+  onFolderClick?: (id?: string) => void;
+  onPreviewClick?: (item: IFileEntity) => void;
   children: (props: {
     dropdownTrigger: React.ReactNode;
     isDragOver: boolean;
@@ -43,6 +46,8 @@ export function FileActionWrapper({
   item,
   children,
   parentFolderParentId,
+  onFolderClick,
+  onPreviewClick,
 }: FileActionWrapperProps) {
   const [activeModal, setActiveModal] = useState<
     "rename" | "trash" | "restore" | "deleteForever" | null
@@ -147,6 +152,14 @@ export function FileActionWrapper({
     window.open(downloadUrl, "_blank");
   };
 
+  const handlePreview = () => {
+    if (item.isFolder) {
+      if (onFolderClick) onFolderClick(item.id);
+    } else {
+      if (onPreviewClick) onPreviewClick(item);
+    }
+  };
+
   const dropdownTrigger = (
     <DropdownMenu>
       <DropdownMenuTrigger onClick={(e) => e.stopPropagation()}>
@@ -178,6 +191,13 @@ export function FileActionWrapper({
           </>
         ) : (
           <>
+            <DropdownMenuItem
+              onClick={handlePreview}
+              className="flex items-center gap-2 cursor-pointer rounded-sm px-2 py-1.5 text-xs outline-none hover:bg-muted"
+            >
+              <Eye className="size-3.5" />
+              {item.isFolder ? "Открыть папку" : "Посмотреть"}
+            </DropdownMenuItem>
             {!item.isFolder && (
               <DropdownMenuItem
                 onClick={handleDownload}

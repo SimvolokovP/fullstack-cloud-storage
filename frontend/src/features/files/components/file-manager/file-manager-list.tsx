@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { DndContext, DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { FolderCard } from "../folder-card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { cn } from "@/shared/lib/utils";
@@ -10,6 +17,7 @@ import { FileActionWrapper } from "../file-actions/file-actions-wrapper";
 import { useMoveFile } from "../../hooks/use-move-file";
 import { toastMessageHandler } from "@/shared/utils/toast-message-handler";
 import { FileDropZoneUp } from "./file-drop-zone-up";
+import { FilePreviewDialog } from "./file-preview-dialog";
 
 interface FileManagerListProps {
   items: IFileEntity[];
@@ -26,7 +34,9 @@ export function FileManagerList({
   onFolderClick,
   currentFolderParentId,
 }: FileManagerListProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  const [previewItem, setPreviewItem] = useState<IFileEntity | null>(null);
 
   const { mutate: moveFile } = useMoveFile({
     onSuccess: () => {
@@ -40,7 +50,7 @@ export function FileManagerList({
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -107,6 +117,7 @@ export function FileManagerList({
               key={item.id}
               item={item}
               parentFolderParentId={currentFolderParentId}
+              onPreviewClick={setPreviewItem}
             >
               {({ dropdownTrigger, isDragOver }) => (
                 <FolderCard
@@ -133,6 +144,7 @@ export function FileManagerList({
             key={item.id}
             item={item}
             parentFolderParentId={currentFolderParentId}
+            onPreviewClick={setPreviewItem}
           >
             {({ dropdownTrigger, isDragOver }) => (
               <div
@@ -144,7 +156,8 @@ export function FileManagerList({
                 className={cn(
                   "group flex items-center justify-between p-3 text-sm hover:bg-secondary/30 transition-all",
                   item.isFolder && onFolderClick && "cursor-pointer",
-                  isDragOver && "bg-primary/10 hover:bg-primary/10 ring-2 ring-primary ring-inset z-10"
+                  isDragOver &&
+                    "bg-primary/10 hover:bg-primary/10 ring-2 ring-primary ring-inset z-10",
                 )}
               >
                 <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -168,13 +181,23 @@ export function FileManagerList({
   };
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="flex flex-col gap-4 w-full">
         {isDragging && currentFolderParentId !== undefined && (
           <FileDropZoneUp parentId={currentFolderParentId} />
         )}
         {renderContent()}
       </div>
+
+      <FilePreviewDialog
+        item={previewItem}
+        open={previewItem !== null}
+        onOpenChange={(open) => !open && setPreviewItem(null)}
+      />
     </DndContext>
   );
 }
