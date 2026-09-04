@@ -11,6 +11,7 @@ import {
   UploadedFile,
   ParseUUIDPipe,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -29,6 +30,7 @@ import { User } from '../user/entities/user.entity';
 import { FilesQueryDto } from './dto/files-query.dto';
 import { PaginatedFilesResponse } from './entities/paginated-files';
 import { RenameFileDto } from './dto/rename-file.dto';
+import { type Response } from 'express';
 
 @ApiTags('Files Manager')
 @Controller('files')
@@ -105,5 +107,61 @@ export class FilesController {
     @Authorized('id') userId: string,
   ): Promise<FileEntity[]> {
     return this.filesService.getBreadcrumbs(id, userId);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Загрузить файл в облако' })
+  @ApiQuery({ name: 'parentId', required: false, description: 'UUID папки' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: FileEntity })
+  @Authorization()
+  async uploadFile(
+    @Authorized() user: User,
+    @UploadedFile() file: Express.Multer.File,
+    @Query('parentId') parentId?: string,
+  ): Promise<FileEntity> {
+    return this.filesService.uploadFile(user, file, parentId);
+  }
+
+  @Get('download/:id')
+  @ApiOperation({ summary: 'Скачать файл по ID' })
+  @Authorization()
+  async download(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Authorized('id') userId: string,
+    @Res() res: Response,
+  ) {
+    const { stream, filename, mimeType } =
+      await this.filesService.getFileStream(id, userId);
+
+    res.set({
+      'Content-Type': mimeType || 'application/octet-stream',
+      'Content-Disposition': `attachment; filename="${encodeURIComponent(filename)}"`,
+    });
+
+    stream.pipe(res);
+  }
+
+  @Delete(':id/forever')
+  @ApiOperation({ summary: 'Удалить файл или папку навсегда' })
+  @Authorization()
+  async deleteForever(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Authorized('id') userId: string,
+  ) {
+    return this.filesService.deleteForever(id, userId);
+  }
+
+  @Patch(':id/move')
+  @ApiOperation({ summary: 'Переместить файл или папку в другую директорию' })
+  @ApiResponse({ status: HttpStatus.OK, type: FileEntity })
+  @Authorization()
+  async move(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Authorized('id') userId: string,
+    @Body('targetParentId') targetParentId: string | null,
+  ): Promise<FileEntity> {
+    return this.filesService.move(id, userId, targetParentId);
   }
 }

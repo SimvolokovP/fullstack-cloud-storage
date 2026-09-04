@@ -3,23 +3,33 @@ import { filesService } from "../services/files.service";
 import { AxiosError } from "axios";
 import { BackendErrorData, errorCatch } from "@/shared/api/api.config";
 
-interface UseDeleteForeverOptions {
+interface UploadPayload {
+  file: File;
+  parentId?: string;
+}
+
+interface UseUploadFileProps {
+  parentId?: string;
   onSuccess?: () => void;
   onError?: (message: string) => void;
 }
 
-export function useDeleteForever({
-  onSuccess,
+export const useUploadFile = ({
+  parentId,
   onError,
-}: UseDeleteForeverOptions = {}) {
+  onSuccess,
+}: UseUploadFileProps = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => filesService.deleteForever(id),
+    mutationFn: ({ file, parentId }: UploadPayload) =>
+      filesService.uploadFile(file, parentId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["files", "root"],
+        queryKey: ["files", parentId || "root"],
       });
+      await queryClient.invalidateQueries({ queryKey: ["auth-user"] });
+
       if (onSuccess) {
         onSuccess();
       }
@@ -31,4 +41,4 @@ export function useDeleteForever({
       }
     },
   });
-}
+};

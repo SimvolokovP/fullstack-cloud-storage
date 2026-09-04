@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { filesService } from "../services/files.service";
+import { AxiosError } from "axios";
+import { BackendErrorData, errorCatch } from "@/shared/api/api.config";
 
 interface UseRestoreFromTrashOptions {
   onSuccess?: () => void;
@@ -9,18 +12,23 @@ export function useRestoreFromTrash({
   onSuccess,
   onError,
 }: UseRestoreFromTrashOptions = {}) {
-  const [isPending, setIsPending] = useState(false);
+  const queryClient = useQueryClient();
 
-  const mutate = (id: string) => {
-    setIsPending(true);
-
-    setTimeout(() => {
-      setIsPending(false);
+  return useMutation({
+    mutationFn: (id: string) => filesService.restore(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["files"],
+      });
       if (onSuccess) {
         onSuccess();
       }
-    }, 1000);
-  };
-
-  return { mutate, isPending };
+    },
+    onError: (error: AxiosError<BackendErrorData>) => {
+      const message = errorCatch(error);
+      if (onError) {
+        onError(message);
+      }
+    },
+  });
 }

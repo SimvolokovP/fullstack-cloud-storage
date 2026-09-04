@@ -40,10 +40,48 @@ export const filesService = {
     return response.data;
   },
 
+  async deleteForever(id: string) {
+    const response = await AUTH_API.delete<{ success: boolean }>(
+      `/files/${id}/forever`,
+    );
+    return response.data;
+  },
+
+  async restore(id: string) {
+    const response = await AUTH_API.patch<{ success: boolean }>(
+      `/files/${id}/restore`,
+    );
+    return response.data;
+  },
+
   async getBreadcrumbs(id: string) {
     const response = await AUTH_API.get<IFileEntity[]>(
       `/files/${id}/breadcrumbs`,
     );
+    return response.data;
+  },
+
+  async uploadFile(file: File, parentId?: string) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await AUTH_API.post<IFileEntity>(
+      "/files/upload",
+      formData,
+      {
+        params: parentId ? { parentId } : {},
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return response.data;
+  },
+
+  async moveFile(id: string, targetParentId: string | null) {
+    const response = await AUTH_API.patch<IFileEntity>(`/files/${id}/move`, {
+      targetParentId,
+    });
     return response.data;
   },
 };

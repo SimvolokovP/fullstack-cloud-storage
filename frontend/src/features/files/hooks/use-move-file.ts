@@ -3,22 +3,25 @@ import { filesService } from "../services/files.service";
 import { AxiosError } from "axios";
 import { BackendErrorData, errorCatch } from "@/shared/api/api.config";
 
-interface UseDeleteForeverOptions {
+interface UseMoveFileOptions {
   onSuccess?: () => void;
   onError?: (message: string) => void;
 }
 
-export function useDeleteForever({
-  onSuccess,
-  onError,
-}: UseDeleteForeverOptions = {}) {
+interface MoveFileVariables {
+  id: string;
+  targetParentId: string | null;
+}
+
+export function useMoveFile({ onSuccess, onError }: UseMoveFileOptions = {}) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => filesService.deleteForever(id),
+    mutationFn: ({ id, targetParentId }: MoveFileVariables) =>
+      filesService.moveFile(id, targetParentId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["files", "root"],
+        queryKey: ["files"],
       });
       if (onSuccess) {
         onSuccess();

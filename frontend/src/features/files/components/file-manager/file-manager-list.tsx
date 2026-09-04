@@ -2,13 +2,14 @@ import { FolderCard } from "../folder-card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { cn } from "@/shared/lib/utils";
 import { IFileEntity } from "../../types/files.types";
-import { FileActionWrapper } from "../file-actions-wrapper";
+import { FileActionWrapper } from "../file-actions/file-actions-wrapper";
 
 interface FileManagerListProps {
   items: IFileEntity[];
   isLoading: boolean;
   viewMode: "grid" | "list";
   onFolderClick?: (id?: string) => void;
+  currentFolderParentId?: string | null;
 }
 
 export function FileManagerList({
@@ -16,6 +17,7 @@ export function FileManagerList({
   isLoading,
   viewMode,
   onFolderClick,
+  currentFolderParentId,
 }: FileManagerListProps) {
   if (isLoading) {
     return (
@@ -59,7 +61,11 @@ export function FileManagerList({
     return (
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {items.map((item) => (
-          <FileActionWrapper key={item.id} item={item}>
+          <FileActionWrapper
+            key={item.id}
+            item={item}
+            parentFolderParentId={currentFolderParentId}
+          >
             {({ dropdownTrigger }) => (
               <FolderCard
                 item={item}
@@ -80,7 +86,11 @@ export function FileManagerList({
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card/40 backdrop-blur-xl divide-y divide-border/60">
       {items.map((item) => (
-        <FileActionWrapper key={item.id} item={item}>
+        <FileActionWrapper
+          key={item.id}
+          item={item}
+          parentFolderParentId={currentFolderParentId}
+        >
           {({ dropdownTrigger }) => (
             <div
               onClick={
