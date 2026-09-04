@@ -40,6 +40,11 @@ interface FolderCardProps {
   item: IFileEntity;
   onClick?: () => void;
   dropdownTrigger: React.ReactNode;
+  dragHandleProps: {
+    ref: (node: HTMLElement | null) => void;
+    style: React.CSSProperties;
+    [key: string]: unknown;
+  };
   isDragOver?: boolean;
 }
 
@@ -47,13 +52,15 @@ export function FolderCard({
   item,
   onClick,
   dropdownTrigger,
+  dragHandleProps,
   isDragOver,
 }: FolderCardProps) {
   return (
     <div
+      {...dragHandleProps}
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 shadow-sm backdrop-blur-xl transition-all cursor-pointer hover:bg-card/80",
+        "group relative flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 shadow-sm backdrop-blur-xl transition-all cursor-grab active:cursor-grabbing hover:bg-card/80",
         isDragOver &&
           "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background bg-primary/5 hover:bg-primary/5",
       )}

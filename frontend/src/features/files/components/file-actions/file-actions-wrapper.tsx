@@ -38,6 +38,11 @@ interface FileActionWrapperProps {
   onPreviewClick?: (item: IFileEntity) => void;
   children: (props: {
     dropdownTrigger: React.ReactNode;
+    dragHandleProps: {
+      ref: (node: HTMLElement | null) => void;
+      style: React.CSSProperties;
+      [key: string]: unknown;
+    };
     isDragOver: boolean;
   }) => React.ReactNode;
 }
@@ -57,6 +62,7 @@ export function FileActionWrapper({
     attributes,
     listeners,
     setNodeRef: setDraggableRef,
+    setActivatorNodeRef,
     transform,
     isDragging,
   } = useDraggable({
@@ -241,7 +247,14 @@ export function FileActionWrapper({
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
     opacity: isDragging ? 0.4 : undefined,
-    touchAction: isDragging ? "none" : "auto",
+    touchAction: "pan-y",
+  };
+
+  const dragHandleProps = {
+    ref: setActivatorNodeRef,
+    style: { touchAction: "pan-y" } as React.CSSProperties,
+    ...listeners,
+    ...attributes,
   };
 
   return (
@@ -251,11 +264,9 @@ export function FileActionWrapper({
         setDroppableRef(node);
       }}
       style={style}
-      {...listeners}
-      {...attributes}
       className="w-full h-full select-none"
     >
-      {children({ dropdownTrigger, isDragOver: isOver })}
+      {children({ dropdownTrigger, dragHandleProps, isDragOver: isOver })}
 
       <RenameDialog
         open={activeModal === "rename"}

@@ -6,6 +6,7 @@ import {
   DragEndEvent,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -49,6 +50,12 @@ export function FileManagerList({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
       },
     }),
   );
@@ -119,7 +126,7 @@ export function FileManagerList({
               parentFolderParentId={currentFolderParentId}
               onPreviewClick={setPreviewItem}
             >
-              {({ dropdownTrigger, isDragOver }) => (
+              {({ dropdownTrigger, dragHandleProps, isDragOver }) => (
                 <FolderCard
                   item={item}
                   onClick={
@@ -128,6 +135,7 @@ export function FileManagerList({
                       : undefined
                   }
                   dropdownTrigger={dropdownTrigger}
+                  dragHandleProps={dragHandleProps}
                   isDragOver={isDragOver}
                 />
               )}
@@ -146,8 +154,9 @@ export function FileManagerList({
             parentFolderParentId={currentFolderParentId}
             onPreviewClick={setPreviewItem}
           >
-            {({ dropdownTrigger, isDragOver }) => (
+            {({ dropdownTrigger, dragHandleProps, isDragOver }) => (
               <div
+                {...dragHandleProps}
                 onClick={
                   item.isFolder && onFolderClick
                     ? () => onFolderClick(item.id)
