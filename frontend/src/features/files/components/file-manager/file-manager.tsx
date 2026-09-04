@@ -6,16 +6,8 @@ import { FileManagerList } from "./file-manager-list";
 import { CreateFolderDialog } from "../create-folder-dialog";
 import { Pagination } from "@/shared/ui/pagination";
 import { SortOption } from "./sort-dropdown";
-import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import { useFiles } from "../../hooks/use-files";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/shared/ui/drawer";
 import { FilesBreadcrumbs } from "../files-breadcrumbs";
 import { FileUploader, FileUploaderRef } from "./file-uploader";
 import { useFilesBreadcrumbs } from "../../hooks/use-files-breadcrumbs";
@@ -39,10 +31,8 @@ export function FileManager({
   const [search, setSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState<boolean>(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [isUploadPending, setIsUploadPending] = useState<boolean>(false);
 
-  const isMobile = useIsMobile();
   const uploaderRef = useRef<FileUploaderRef>(null);
   const debouncedSearch = useDebounce(search, 400);
 
@@ -77,12 +67,10 @@ export function FileManager({
   const handleSortChange = (value: SortOption) => {
     setSortBy(value);
     setPage(1);
-    setIsMobileMenuOpen(false);
   };
 
   const handleViewModeChange = (mode: "grid" | "list") => {
     setViewMode(mode);
-    setIsMobileMenuOpen(false);
   };
 
   const handleNavigate = (id?: string) => {
@@ -93,12 +81,10 @@ export function FileManager({
   };
 
   const handleCreateFolderClick = () => {
-    setIsMobileMenuOpen(false);
     setIsCreateFolderOpen(true);
   };
 
   const handleUploadClick = () => {
-    setIsMobileMenuOpen(false);
     uploaderRef.current?.triggerUpload();
   };
 
@@ -118,8 +104,6 @@ export function FileManager({
         sortBy={sortBy}
         onSortByChange={handleSortChange}
         onCreateFolderClick={handleCreateFolderClick}
-        isMobile={isMobile}
-        onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
         isInTrash={isInTrash}
         onUploadClick={handleUploadClick}
         isUploadPending={isUploadPending}
@@ -157,34 +141,6 @@ export function FileManager({
           onOpenChange={setIsCreateFolderOpen}
         />
       )}
-
-      <Drawer open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <DrawerContent>
-          <DrawerHeader className="text-left">
-            <DrawerTitle>Параметры и действия</DrawerTitle>
-            <DrawerDescription>
-              Управление отображением, сортировкой и создание новых элементов.
-            </DrawerDescription>
-          </DrawerHeader>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            <FileManagerToolbar
-              search={search}
-              onSearchChange={handleSearchChange}
-              viewMode={viewMode}
-              onViewModeChange={handleViewModeChange}
-              sortBy={sortBy}
-              onSortByChange={handleSortChange}
-              onCreateFolderClick={handleCreateFolderClick}
-              isMobile={false}
-              onOpenMobileMenu={() => {}}
-              isInTrash={isInTrash}
-              onUploadClick={handleUploadClick}
-              isUploadPending={isUploadPending}
-            />
-          </div>
-        </DrawerContent>
-      </Drawer>
     </div>
   );
 }
