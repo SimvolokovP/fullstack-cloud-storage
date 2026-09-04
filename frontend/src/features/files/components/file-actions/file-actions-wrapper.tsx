@@ -1,6 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import {
   Pencil,
   Trash2,
@@ -30,7 +33,10 @@ import { useMoveFile } from "../../hooks/use-move-file";
 interface FileActionWrapperProps {
   item: IFileEntity;
   parentFolderParentId?: string | null;
-  children: (props: { dropdownTrigger: React.ReactNode }) => React.ReactNode;
+  children: (props: {
+    dropdownTrigger: React.ReactNode;
+    isDragOver: boolean;
+  }) => React.ReactNode;
 }
 
 export function FileActionWrapper({
@@ -41,6 +47,24 @@ export function FileActionWrapper({
   const [activeModal, setActiveModal] = useState<
     "rename" | "trash" | "restore" | "deleteForever" | null
   >(null);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDraggableRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: `drag-${item.id}`,
+    disabled: item.isInTrash,
+    data: { id: item.id },
+  });
+
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `drop-${item.id}`,
+    disabled: !item.isFolder || item.isInTrash,
+    data: { id: item.id },
+  });
 
   const form = useForm<RenameFileInput>({
     resolver: zodResolver(renameFileSchema),
@@ -85,7 +109,7 @@ export function FileActionWrapper({
 
   const { mutate: moveFile, isPending: isMovePending } = useMoveFile({
     onSuccess: () => {
-      toastMessageHandler("Объект успешно перемещен вверх.", "success");
+      toastMessageHandler("Объект успешно перемещен.", "success");
     },
     onError: (message) => toastMessageHandler(message, "error"),
   });
@@ -192,9 +216,26 @@ export function FileActionWrapper({
     </DropdownMenu>
   );
 
+  const style: React.CSSProperties = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    opacity: isDragging ? 0.4 : undefined,
+    touchAction: isDragging ? "none" : "auto",
+  };
+
   return (
-    <>
-      {children({ dropdownTrigger })}
+    <div
+      ref={(node) => {
+        setDraggableRef(node);
+        setDroppableRef(node);
+      }}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="w-full h-full select-none"
+    >
+      {children({ dropdownTrigger, isDragOver: isOver })}
 
       <RenameDialog
         open={activeModal === "rename"}
@@ -237,6 +278,6 @@ export function FileActionWrapper({
         isPending={isDeleteForeverPending}
         destructive
       />
-    </>
+    </div>
   );
 }

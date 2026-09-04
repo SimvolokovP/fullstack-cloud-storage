@@ -1,5 +1,6 @@
 import { formatBytes } from "@/features/tariffs/utils/format-bites";
 import { IFileEntity } from "../types/files.types";
+import { cn } from "@/shared/lib/utils";
 
 import {
   Folder,
@@ -9,11 +10,6 @@ import {
   FileSpreadsheet,
   File as FileIcon,
 } from "lucide-react";
-
-interface FolderCardProps {
-  item: IFileEntity;
-  onClick?: () => void;
-}
 
 function getFileIcon(mimeType: string | null, name: string) {
   const extension = name.split(".").pop()?.toLowerCase();
@@ -44,17 +40,23 @@ interface FolderCardProps {
   item: IFileEntity;
   onClick?: () => void;
   dropdownTrigger: React.ReactNode;
+  isDragOver?: boolean;
 }
 
 export function FolderCard({
   item,
   onClick,
   dropdownTrigger,
+  isDragOver,
 }: FolderCardProps) {
   return (
     <div
       onClick={onClick}
-      className="group relative flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 shadow-sm backdrop-blur-xl transition-colors hover:bg-card/80 cursor-pointer"
+      className={cn(
+        "group relative flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 shadow-sm backdrop-blur-xl transition-all cursor-pointer hover:bg-card/80",
+        isDragOver &&
+          "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background bg-primary/5 hover:bg-primary/5",
+      )}
     >
       <div className="flex items-start justify-between">
         <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background">
