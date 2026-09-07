@@ -19,7 +19,7 @@ export const getMailConfig = (config: ConfigService): MailerOptions => {
       },
     },
     defaults: {
-      from: config.get<string>('MAIL_FROM'),
+      from: `"Cloud box" <${config.get('MAIL_FROM')}>`,
     },
   };
 };

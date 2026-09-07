@@ -33,6 +33,7 @@ import { FilesModule } from './files/files.module';
         database: configService.get<string>('POSTGRES_DB'),
         entities: [User, Account, Token, TariffPlan, FileEntity],
         synchronize: IS_DEV_ENV,
+        migrationsRun: true,
       }),
     }),
     UserModule,
