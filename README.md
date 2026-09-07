@@ -26,14 +26,16 @@ A modern, high-performance cloud storage web platform (mvp) that allows users to
 
 ### Screens:
 
-- Main dashboard of the app.
-![Main Page](public/screens/mainPage.png)
+- Main page of the app.
+![Main Page](/screens/mainPage.png)
 - Auth & Yandex Login interface.
-![Auth Page](public/screens/authPage.png)
-- File Management & Vault view.
-![Storage page](public/screens/storagePage.png)
-- Pricing & Tariff upgrade plans.
-![Tariffs page](public/screens/tariffsPage.png)
+![Auth Page](/screens/authPage.png)
+- Dashboard page.
+![Storage page](/screens/dashboardPage.png)
+- Profile settings page.
+![Tariffs page](/screens/settingsPage.png)
+- Mobile view of Dashboard.
+![Tariffs page](/screens/mobileView.png)
 
 ### Docker Commands
 
